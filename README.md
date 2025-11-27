@@ -93,7 +93,18 @@ echo 'GOOGLE_API_KEY="tu_api_key_aqui"' > .env
 
 ## 🎯 Uso
 
-### Opción 1: Jupyter Notebook (Recomendado para Kaggle/Colab)
+Para una guía detallada de todas las formas de uso, consulta [USAGE.md](USAGE.md).
+
+### 🌐 Opción 1: Interfaz Web (¡Nuevo!)
+
+La forma más sencilla de usar el sistema.
+
+```bash
+streamlit run app.py
+```
+Abre `http://localhost:8501` en tu navegador, sube tu archivo y obtén la documentación al instante.
+
+### 📓 Opción 2: Jupyter Notebook (Recomendado para Kaggle/Colab)
 
 1. Abre el notebook principal:
    ```bash
@@ -107,7 +118,7 @@ echo 'GOOGLE_API_KEY="tu_api_key_aqui"' > .env
    jupyter notebook project_notebook_local.ipynb
    ```
 
-### Opción 2: Script de Verificación
+### 💻 Opción 3: Script de Verificación
 
 Ejecuta el pipeline completo con datos de prueba reales:
 

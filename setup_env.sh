@@ -18,7 +18,7 @@ source .venv/bin/activate
 pip install --upgrade pip
 
 # Instalar dependencias del proyecto
-pip install notebook google-adk google-generativeai python-dotenv
+pip install notebook google-adk google-generativeai python-dotenv streamlit
 
 # 3. Lanzar Jupyter Notebook
 echo "✨ Todo listo. Lanzando Jupyter Notebook..."

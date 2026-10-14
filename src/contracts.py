@@ -140,11 +140,19 @@ class TranscriptSegment(BaseModel):
     frame_timestamp_ms: Optional[int] = None
 
 
+class DiarizedSpeaker(BaseModel):
+    """Identificación y rol de un interlocutor en grabaciones de voz o reuniones."""
+    speaker_id: str = Field(..., description="Identificador único (ej: Speaker 1, Persona A, Michel)")
+    display_name: Optional[str] = Field(None, description="Nombre inferido o asignado")
+    role: Optional[str] = Field(None, description="Rol inferido (ej: Presentador, Cliente, Desarrollador)")
+
+
 class GroundedTranscript(BaseModel):
     """Contrato de salida de la etapa de grounding (task IA)."""
     asset_id: str
     language: Optional[str] = None
     segments: list[TranscriptSegment] = Field(default_factory=list)
+    speakers: list[DiarizedSpeaker] = Field(default_factory=list)
     full_text: str = ""
     warnings: list[str] = Field(default_factory=list)
 
@@ -263,6 +271,49 @@ class TechnicalDocument(BaseModel):
 
 
 # --------------------------------------------------------------------------- #
+# Etapa 6 — Grabaciones de Voz / Audio Móvil (Diarización, Action Items, MindMap)
+# --------------------------------------------------------------------------- #
+
+class ActionItemPriority(str, Enum):
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+
+
+class ActionItem(BaseModel):
+    """Tarea pendiente o compromiso extraído de una grabación de voz."""
+    item_id: str
+    task: str = Field(..., description="Descripción clara y accionable de la tarea")
+    assignee: Optional[str] = Field(None, description="Persona responsable o interlocutor asignado")
+    due_date: Optional[str] = Field(None, description="Fecha límite o plazo mencionado si aplica")
+    priority: ActionItemPriority = ActionItemPriority.MEDIUM
+    context: Optional[str] = Field(None, description="Contexto adicional o cita relevante del audio")
+    source_timestamp_ms: Optional[int] = Field(None, description="Momento del audio donde se acordó")
+
+
+class MindMapDiagram(BaseModel):
+    """Diagrama conceptual en sintaxis Mermaid generado desde el contenido de audio."""
+    title: str
+    diagram_type: Literal["mindmap", "graph", "flowchart"] = "mindmap"
+    mermaid_code: str = Field(..., description="Código Mermaid listo para renderizar")
+    summary: Optional[str] = None
+
+
+class AudioNoteDocument(BaseModel):
+    """Documento estructurado generado a partir de una nota de voz o reunión grabada."""
+    title: str
+    language: Optional[str] = None
+    executive_summary: str
+    key_topics: list[str] = Field(default_factory=list)
+    key_decisions: list[str] = Field(default_factory=list)
+    speakers: list[DiarizedSpeaker] = Field(default_factory=list)
+    transcript_segments: list[TranscriptSegment] = Field(default_factory=list)
+    action_items: list[ActionItem] = Field(default_factory=list)
+    mind_map: Optional[MindMapDiagram] = None
+    raw_markdown: Optional[str] = None
+
+
+# --------------------------------------------------------------------------- #
 # Resultado final del pipeline (contrato de transporte hacia frontend/QA)
 # --------------------------------------------------------------------------- #
 
@@ -276,5 +327,6 @@ class PipelineResult(BaseModel):
     analysis: Optional[AnalysisReport] = None
     validation: Optional[ValidationResult] = None
     document: Optional[TechnicalDocument] = None
+    audio_document: Optional[AudioNoteDocument] = None
     status: Literal["running", "ok", "failed", "partial"] = "running"
     error: Optional[str] = None

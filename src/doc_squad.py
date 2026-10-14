@@ -245,6 +245,32 @@ async def run_pipeline_async(file_path: str, request_context: str, status_callba
 # --- WRAPPER SÍNCRONO PARA APP.PY ---
 def run_documentation_pipeline(file_path: str, request_context: str = "", status_callback=None):
     """
-    Wrapper síncrono para ejecutar el pipeline async.
+    Wrapper síncrono para ejecutar el pipeline async de documentación técnica.
     """
     return asyncio.run(run_pipeline_async(file_path, request_context, status_callback))
+
+
+def run_audio_pipeline(
+    file_path: str,
+    request_context: str = "",
+    enable_diarization: bool = True,
+    enable_action_items: bool = True,
+    enable_mind_map: bool = True,
+    enable_summary: bool = True,
+    status_callback=None,
+):
+    """
+    Ejecuta el pipeline especializado de audio móvil (.m4a, .mp3, etc.)
+    con diarización de interlocutores, action items y mapa mental Mermaid.
+    """
+    from src.audio.pipeline import AudioProcessor
+    processor = AudioProcessor()
+    return processor.process_audio(
+        file_path,
+        context=request_context,
+        enable_diarization=enable_diarization,
+        enable_action_items=enable_action_items,
+        enable_mind_map=enable_mind_map,
+        enable_summary=enable_summary,
+        status_callback=status_callback,
+    )

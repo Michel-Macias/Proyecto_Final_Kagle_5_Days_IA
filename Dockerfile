@@ -24,9 +24,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia del código fuente
 COPY . .
 
+# Create non-root user for security
+RUN groupadd -r app && useradd -r -g app app
+COPY --chown=app:app . .
+RUN chown -R app:app /app
+
 EXPOSE 8501
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8501/_stcore/health || exit 1
+
+# Run as non-root user
+USER app
 
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
